@@ -1,0 +1,41 @@
+<html>
+    <head>
+        <title>YTCast</title>
+        <style>
+            body {
+                font-family: 'Roboto', sans-serif;
+                text-align: center;
+                background-color: rgba(21,21,21);
+                color: white;
+            }
+            #images {
+                display: flex;
+                margin-bottom: 20px;
+                justify-content: center;
+            }
+            #images img {
+                margin-right: 20px;
+                height: min-content;
+            }
+            a {
+                color: white;
+            }
+            .btBr {
+                margin-bottom: 100px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Welcome!</h1>
+        <h3 style="margin-bottom: 50px;">YTCast is successfully configured on a server side!<br><br>What to do now:</h3>
+        <div id="images">
+            <img src="windows-ipconfig.png"/>
+            <img src="linux-ifconfig.png"/>
+        </div>
+        <h2>Find your local IP address.</h2>
+        <h3 class="btBr">For Windows users: use the <code>ipconfig</code> command, look for <code>Wireless LAN adapter Wi-Fi</code> line and copy your address below. (image 1)<br>For Linux users: use the <code>ifconfig</code> command, look for <code>wifi0</code> line, and copy the local IP address below the wifi0 line. (image 2)</h3>
+        <h2 class="btBr">Go to <code>192.168.x.xxx/mobile</code> on your device you want YouTube to be casted on. Replace all X's with appropriate numbers from your local IP address.</h2>
+        <h2 class="btBr">Click <a href="/search">here</a> to search for a video to be casted</h2>
+        <h2>When you click the video on your computer, you should be able to see it on your mobile device shortly!<br>Enjoy!</h2>
+    </body>
+</html>

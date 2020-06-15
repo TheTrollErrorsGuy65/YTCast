@@ -1,0 +1,162 @@
+<html>
+    <head>
+        <title>YTCast</title>
+        <style>
+            body {
+                font-family: 'Roboto', sans-serif;
+                background-color: rgba(21,21,21);
+                color: white;
+                text-align: center;
+            }
+            input {
+                outline: none;
+                background: none;
+                color: white;
+                border: none;
+                border-bottom: white 2px solid;
+            }
+            a {
+                color: white;
+            }
+            button {
+                border: none;
+                outline: none;
+                background: none;
+            }
+            #info {
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+                transition: all 0.75s;
+                width: 40%;
+                height: max-content;
+                background-color: aquamarine;
+                color: black;
+                border-radius: 10px;
+                padding-top: 10px;
+                padding-bottom: 10px;
+            }
+            #search-query {
+                width: 40%;
+            }
+            .result {
+                margin-top: 50px;
+                display: flex;
+                cursor: pointer;
+                text-align: left;
+                justify-content: center;
+            }
+            .result h1 {
+                margin-left: 20px;
+                text-decoration: none;
+                height: fit-content;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>YTCast</h1>
+        <input type="text" autocomplete="off" spellcheck="false" id="search-query" placeholder="Type a search term here!">
+        <button onclick="search();">🔎</button>
+        <div id="info" style="top: -100%;">
+            <h3>Information</h3>
+        </div>
+    </body>
+    <script>
+        function startDownload(id, title) {
+            let smoothScroll = setInterval(function() {
+                window.scrollBy(0, -10);
+                if(window.scrollY <= 0) {
+                    clearInterval(smoothScroll);
+                }
+            }, 1)
+            showInfo("Preparing " + title + "...")
+            fetch("/download?v=" + id)
+            .then(r => {
+                r.text().then(k => {
+                    if(k == "OK") {
+                        showInfo("Video playing on a mobile device!")
+                    }
+                })
+            })
+        }
+
+        function showInfo(content) {
+            let inf = document.getElementById("info")
+            inf.innerHTML = content
+            inf.style.top = "50px";
+            setTimeout(function() {
+                inf.style.top = "-100%"
+            }, 5000)
+        }
+        let key = ""
+        let hasKey = true;
+        fetch("/api/ytkey")
+        .then(r => {
+            r.text().then(k => {
+                key = k
+                if(key == "") {
+                    hasKey = false;
+                    showInfo("You didn't add your YouTube API key to start.js file. You will only be able to cast videos using their links.")
+                }
+            })
+        })
+
+        function search() {
+            for(let i of document.getElementsByClassName("result")) {
+                setTimeout(function() {document.body.removeChild(i)}, 10)
+            }
+            let q = document.getElementsByTagName("input")[0].value
+            document.getElementsByTagName("input")[0].disabled = true
+            let path = "https://www.googleapis.com/youtube/v3/search?part=snippet&key="+key+"&order=relevance&type=video&maxResults=10&q=" + q
+            if(hasKey == false) {
+                if(q.includes("youtube.com") == true || q.includes("youtu.be") == true || q.length == 11) {
+                    q = q.split("=")[q.split("=").length - 1]
+                    q = q.split("/")[q.split("/").length - 1]
+                    showInfo("Getting ready to play " + q + "...")
+                    fetch("/download?v=" + q)
+                    .then(r => {
+                        r.text().then(k => {
+                            if(k == "OK") {
+                                showInfo("Video playing on the device!")
+                            }
+                        })
+                    })
+                } else {
+                    showInfo("Use a valid YouTube link!<br>Examples:<br>https://www.youtube.com/watch?v=fo0uEMoOlH0<br>https://youtu.be/fo0uEMoOlH0<br>fo0uEMoOlH0")
+                    document.getElementsByTagName("input")[0].disabled = false
+                }
+            } else {
+                if(q.includes("youtube.com") == true || q.includes("youtu.be") == true) {
+                    q = q.split("=")[q.split("=").length - 1]
+                    q = q.split("/")[q.split("/").length - 1]
+                    showInfo("Getting ready to play " + q + "...")
+                    fetch("/download?v=" + q)
+                    .then(r => {
+                        r.text().then(k => {
+                            if(k == "OK") {
+                                showInfo("Video playing on the device!")
+                            }
+                        })
+                    })
+                } else {
+                    fetch(path)
+                    .then(r => {
+                        r.json().then(k => {
+                            console.log(k)
+                            for(let res in k.items) {
+                                let re = k.items[res]
+                                let visRes = document.createElement("div")
+                                visRes.setAttribute("class", "result");
+                                visRes.setAttribute("onclick", "startDownload('"+re.id.videoId+"', '"+re.snippet.title+"');")
+                                visRes.innerHTML = "<img src='" + re.snippet.thumbnails.medium.url + "'><h1>" + re.snippet.title + "</h1>"
+                                document.body.appendChild(visRes)
+                            }
+                            document.getElementsByTagName("input")[0].disabled = false
+                        })
+                    })
+                }
+                
+            }
+        }
+    </script>
+</html>
