@@ -118,6 +118,7 @@
                         r.text().then(k => {
                             if(k == "OK") {
                                 showInfo("Video playing on the device!")
+                                document.getElementsByTagName("input")[0].disabled = false
                             }
                         })
                     })
@@ -135,6 +136,7 @@
                         r.text().then(k => {
                             if(k == "OK") {
                                 showInfo("Video playing on the device!")
+                                document.getElementsByTagName("input")[0].disabled = false
                             }
                         })
                     })
